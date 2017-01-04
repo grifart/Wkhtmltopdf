@@ -1,22 +1,12 @@
 <?php
 
-/**
- * This file is part of the Kdyby (http://www.kdyby.org)
- *
- * Copyright (c) 2011 Ladislav Marek <ladislav@marek.su>
- *
- * For the full copyright and license information, please view the file license.txt that was distributed with this source code.
- */
-
-namespace Kdyby\Wkhtmltopdf;
-
-use Nette\Object;
+namespace Billdu\Wkhtmltopdf;
 
 
 /**
- * @author Ladislav Marek <ladislav@marek.su>
+ * @author Martin Bažík <martin@bazo.sk>
  */
-class PageMeta extends Object implements IDocumentPart
+class PageMeta implements IDocumentPart
 {
 
 	/** @var string */
@@ -49,7 +39,6 @@ class PageMeta extends Object implements IDocumentPart
 	/** @var int */
 	public $spacing = 0;
 
-
 	/**
 	 * @param string
 	 */
@@ -74,8 +63,8 @@ class PageMeta extends Object implements IDocumentPart
 			$cmd = "--$this->type-html " . escapeshellarg($file);
 		} else {
 			$cmd = "--$this->type-left " . escapeshellarg($this->left)
-				. " --$this->type-center " . escapeshellarg($this->center)
-				. " --$this->type-right " . escapeshellarg($this->right);
+					. " --$this->type-center " . escapeshellarg($this->center)
+					. " --$this->type-right " . escapeshellarg($this->right);
 		}
 		$cmd .= ' --' . ($this->line ? '' : 'no-') . "$this->type-line";
 		if ($this->fontName !== NULL) {
@@ -86,5 +75,6 @@ class PageMeta extends Object implements IDocumentPart
 		}
 		return $cmd;
 	}
+
 
 }

@@ -1,23 +1,14 @@
 <?php
 
-/**
- * This file is part of the Kdyby (http://www.kdyby.org)
- *
- * Copyright (c) 2011 Ladislav Marek <ladislav@marek.su>
- *
- * For the full copyright and license information, please view the file license.txt that was distributed with this source code.
- */
-
-namespace Kdyby\Wkhtmltopdf;
-
-use Nette\Object;
+namespace Billdu\Wkhtmltopdf;
 
 
 /**
- * @author Ladislav Marek <ladislav@marek.su>
+ * @author Martin Bažík <martin@bazo.sk>
  */
-class Page extends Object implements IDocumentPart
+class Page implements IDocumentPart
 {
+
 	/** @var string */
 	public $file;
 
@@ -42,7 +33,6 @@ class Page extends Object implements IDocumentPart
 	/** @var int */
 	public $zoom = 1;
 
-
 	/**
 	 * @param  Document
 	 * @return string
@@ -55,12 +45,13 @@ class Page extends Object implements IDocumentPart
 		}
 
 		return ($this->isCover ? ' cover ' : ' ')
-			. escapeshellarg($file)
-			. ($this->encoding ? ' --encoding ' . escapeshellarg($this->encoding) : '')
-			. ($this->usePrintMediaType ? ' --print-media-type' : '')
-			. ($this->styleSheet ? ' --user-style-sheet ' . escapeshellarg($this->styleSheet) : '')
-			. ($this->javascript ? ' --run-script ' . escapeshellarg($this->javascript) : '')
-			. ' --zoom ' . ($this->zoom * 1);
+				. escapeshellarg($file)
+				. ($this->encoding ? ' --encoding ' . escapeshellarg($this->encoding) : '')
+				. ($this->usePrintMediaType ? ' --print-media-type' : '')
+				. ($this->styleSheet ? ' --user-style-sheet ' . escapeshellarg($this->styleSheet) : '')
+				. ($this->javascript ? ' --run-script ' . escapeshellarg($this->javascript) : '')
+				. ' --zoom ' . ($this->zoom * 1);
 	}
+
 
 }

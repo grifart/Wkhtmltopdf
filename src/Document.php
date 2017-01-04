@@ -1,41 +1,25 @@
 <?php
 
-/**
- * This file is part of the Kdyby (http://www.kdyby.org)
- *
- * Copyright (c) 2011 Ladislav Marek <ladislav@marek.su>
- *
- * For the full copyright and license information, please view the file license.txt that was distributed with this source code.
- */
-
-namespace Kdyby\Wkhtmltopdf;
-
-use Nette\Object,
-	Nette\Application\IResponse,
-	Nette\Http,
-	Nette\InvalidStateException;
+namespace Billdu\Wkhtmltopdf;
 
 
 /**
- * @property-read PageMeta $header
- * @property-read PageMeta $footer
- *
- * @author Ladislav Marek <ladislav@marek.su>
+ * @author Martin Bažík <martin@bazo.sk>
  */
-class Document extends Object implements IResponse
+class Document
 {
 
 	/** @var string	NULL means autodetect */
 	public static $executable;
 
-	/** @var array	possible executables */
-	public static $executables = array('wkhtmltopdf', 'wkhtmltopdf-amd64', 'wkhtmltopdf-i386');
+	/** @var array possible executables */
+	public static $executables = ['wkhtmltopdf', 'wkhtmltopdf-amd64', 'wkhtmltopdf-i386'];
 
 	/** @var int */
 	public $dpi = 200;
 
 	/** @var array */
-	public $margin = array(10, 10, 10, 10);
+	public $margin = [10, 10, 10, 10];
 
 	/** @var string */
 	public $orientation = 'portrait';
@@ -55,6 +39,12 @@ class Document extends Object implements IResponse
 	/** @var string */
 	public $styleSheet;
 
+	/** @var bool */
+	public $disableSmartShrinking = TRUE;
+
+	/** @var bool */
+	public $disableInternalLinks = TRUE;
+
 	/** @var PageMeta */
 	private $header;
 
@@ -62,20 +52,19 @@ class Document extends Object implements IResponse
 	private $footer;
 
 	/** @var array|Page[] */
-	private $pages = array();
+	private $pages = [];
 
 	/** @var string */
 	public $tmpDir;
 
 	/** @var array */
-	private $tmpFiles = array();
+	private $tmpFiles = [];
 
 	/** @var resource */
 	private $p;
 
 	/** @var array */
 	private $pipes;
-
 
 	/**
 	 * @param string
@@ -117,9 +106,9 @@ class Document extends Object implements IResponse
 	 */
 	public function addHtml($html, $isCover = FALSE)
 	{
-		$this->pages[] = $page = $this->createPage();
-		$page->html = $html;
-		$page->isCover = $isCover;
+		$this->pages[]	 = $page			 = $this->createPage();
+		$page->html		 = $html;
+		$page->isCover	 = $isCover;
 		return $page;
 	}
 
@@ -131,9 +120,9 @@ class Document extends Object implements IResponse
 	 */
 	public function addFile($file, $isCover = FALSE)
 	{
-		$this->pages[] = $page = $this->createPage();
-		$page->file = $file;
-		$page->isCover = $isCover;
+		$this->pages[]	 = $page			 = $this->createPage();
+		$page->file		 = $file;
+		$page->isCover	 = $isCover;
 		return $page;
 	}
 
@@ -144,7 +133,7 @@ class Document extends Object implements IResponse
 	 */
 	public function addToc($header = NULL)
 	{
-		$this->pages[] = $toc = new Toc;
+		$this->pages[]	 = $toc			 = new Toc;
 		if ($header !== NULL) {
 			$toc->header = $header;
 		}
@@ -168,10 +157,10 @@ class Document extends Object implements IResponse
 	 */
 	private function createPage()
 	{
-		$page = new Page;
-		$page->encoding = $this->encoding;
+		$page					 = new Page;
+		$page->encoding			 = $this->encoding;
 		$page->usePrintMediaType = $this->usePrintMediaType;
-		$page->styleSheet = $this->styleSheet;
+		$page->styleSheet		 = $this->styleSheet;
 		return $page;
 	}
 
@@ -192,34 +181,9 @@ class Document extends Object implements IResponse
 
 
 	/**
-	 * Send headers and outputs PDF document to browser.
-	 * @throws InvalidStateException
-	 */
-	public function send(Http\IRequest $httpRequest, Http\IResponse $httpResponse)
-	{
-		$this->convert();
-
-		$output = fgets($this->pipes[1], 5);
-		if ($output === '%PDF') {
-			$httpResponse->setContentType('application/pdf');
-			if (strpos($httpRequest->getHeader('User-Agent'), 'MSIE') != FALSE) {
-				$httpResponse->setHeader('Pragma', 'private');
-				$httpResponse->setHeader('Cache-control', 'private');
-				$httpResponse->setHeader('Accept-Ranges', 'bytes');
-				$httpResponse->setExpiration('- 5 years');
-			}
-			echo $output;
-			fpassthru($this->pipes[1]);
-		}
-
-		$this->close();
-	}
-
-
-	/**
 	 * Save PDF document to file.
 	 * @param  string
-	 * @throws InvalidStateException
+	 * @throws \RuntimeException
 	 */
 	public function save($file)
 	{
@@ -255,31 +219,51 @@ class Document extends Object implements IResponse
 		}
 
 		if (self::$executable === FALSE) {
-			throw new InvalidStateException('Cannot found Wkhtmltopdf executable');
+			throw new \RuntimeException('Wkhtmltopdf executable not found');
 		}
 
-		$m = $this->margin;
-		$cmd = self::$executable . ' -q --disable-smart-shrinking --disable-internal-links'
-			. ' -T ' . escapeshellarg($m[0])
-			. ' -R ' . escapeshellarg($m[1])
-			. ' -B ' . escapeshellarg($m[2])
-			. ' -L ' . escapeshellarg($m[3])
-			. ' --dpi ' . escapeshellarg($this->dpi)
-			. ' --orientation ' . escapeshellarg($this->orientation)
-			. ' --title ' . escapeshellarg($this->title);
+		$cmd = self::$executable . ' -q';
+
+		if ($this->disableSmartShrinking) {
+			$cmd .= ' --disable-smart-shrinking';
+		}
+
+		if ($this->disableInternalLinks) {
+			$cmd .= ' --disable-internal-links';
+		}
+
+		$margins = ['T' => 0, 'R' => 1, 'B' => 2, 'L' => 3];
+
+		foreach ($margins as $margin => $index) {
+			$marginValue = $this->margin[$index];
+			if ($marginValue > -1) {
+				$cmd .= ' -' . $margin . ' ' . escapeshellarg($marginValue);
+			}
+		}
+
+		if (!is_null($this->dpi)) {
+			$cmd .= ' --dpi ' . escapeshellarg($this->dpi);
+		}
+
+		if (!is_null($this->orientation)) {
+			$cmd .= ' --dpi ' . escapeshellarg($this->orientation);
+		}
+
+		if (!is_null($this->title)) {
+			$cmd .= ' --dpi ' . escapeshellarg($this->title);
+		}
 
 		if (is_array($this->size)) {
 			$cmd .= ' --page-width ' . escapeshellarg($this->size[0]);
 			$cmd .= ' --page-height ' . escapeshellarg($this->size[1]);
-
 		} else {
 			$cmd .= ' --page-size ' . escapeshellarg($this->size);
 		}
 
-		if ($this->header !== NULL) {
+		if (!is_null($this->header)) {
 			$cmd .= ' ' . $this->header->buildShellArgs($this);
 		}
-		if ($this->footer !== NULL) {
+		if (!is_null($this->footer)) {
 			$cmd .= ' ' . $this->footer->buildShellArgs($this);
 		}
 		foreach ($this->pages as $page) {
@@ -305,10 +289,10 @@ class Document extends Object implements IResponse
 
 	private function openProcess($cmd, & $pipes)
 	{
-		static $spec = array(
-			1 => array('pipe', 'w'),
-			2 => array('pipe', 'w'),
-		);
+		static $spec = [
+			1	 => ['pipe', 'w'],
+			2	 => ['pipe', 'w'],
+		];
 		return proc_open($cmd, $spec, $pipes);
 	}
 
@@ -318,12 +302,13 @@ class Document extends Object implements IResponse
 		stream_get_contents($this->pipes[1]); // wait for process
 		$error = stream_get_contents($this->pipes[2]);
 		if (proc_close($this->p) > 0) {
-			throw new InvalidStateException($error);
+			throw new \RuntimeException($error);
 		}
 		foreach ($this->tmpFiles as $file) {
 			@unlink($file);
 		}
-		$this->tmpFiles = array();
+		$this->tmpFiles = [];
 	}
+
 
 }

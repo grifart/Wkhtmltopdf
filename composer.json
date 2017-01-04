@@ -1,29 +1,18 @@
 {
 	"name": "billdu/wkhtmltopdf",
 	"type": "library",
-	"description": "Wkhtmltopdf cli wrapper for Nette Framework",
-	"keywords": ["nette", "pdf", "wkhtmltopdf"],
-	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
+	"description": "Wkhtmltopdf cli wrapper",
+	"keywords": ["pdf", "wkhtmltopdf"],
+	"license": ["MIT"],
 	"authors": [
 		{
-			"name": "Ladislav Marek",
-			"email": "ladislav@marek.su"
+			"name": "Martin Bažík",
+			"email": "martin@bazo.sk"
 		}
 	],
-	"require": {
-		"nette/application": "~2.2@dev",
-		"nette/di": "~2.2@dev",
-		"nette/http": "~2.2@dev",
-		"nette/utils": "~2.2@dev"
-	},
 	"autoload": {
 		"psr-4": {
-			"Kdyby\\Wkhtmltopdf\\": "src/"
-		}
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master": "1.0-dev"
+			"Billdu\\Wkhtmltopdf\\": "src/"
 		}
 	}
 }

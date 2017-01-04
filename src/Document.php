@@ -246,11 +246,11 @@ class Document
 		}
 
 		if (!is_null($this->orientation)) {
-			$cmd .= ' --dpi ' . escapeshellarg($this->orientation);
+			$cmd .= ' --orientation ' . escapeshellarg($this->orientation);
 		}
 
 		if (!is_null($this->title)) {
-			$cmd .= ' --dpi ' . escapeshellarg($this->title);
+			$cmd .= ' --title ' . escapeshellarg($this->title);
 		}
 
 		if (is_array($this->size)) {

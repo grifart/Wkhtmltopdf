@@ -1,5 +1,5 @@
 {
-	"name": "kdyby/wkhtmltopdf",
+	"name": "billdu/wkhtmltopdf",
 	"type": "library",
 	"description": "Wkhtmltopdf cli wrapper for Nette Framework",
 	"keywords": ["nette", "pdf", "wkhtmltopdf"],

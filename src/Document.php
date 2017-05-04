@@ -164,6 +164,7 @@ class Document
 		$page->encoding			 = $this->encoding;
 		$page->usePrintMediaType = $this->usePrintMediaType;
 		$page->styleSheet		 = $this->styleSheet;
+		$page->zoom              = $this->zoom;
 		return $page;
 	}
 
@@ -264,7 +265,7 @@ class Document
 		}
 
 		if (!is_null($this->zoom)) {
-			$cmd .= ' --zoom ' . escapeshellarg($this->zoom);
+			$cmd .= ' --zoom ' . ($this->zoom * 1);
 		}
 
 		if (!is_null($this->header)) {

@@ -27,6 +27,9 @@ class Document
 	/** @var string */
 	public $size = 'A4';
 
+	/** @var float */
+	public $zoom;
+
 	/** @var string */
 	public $title;
 
@@ -258,6 +261,10 @@ class Document
 			$cmd .= ' --page-height ' . escapeshellarg($this->size[1]);
 		} else {
 			$cmd .= ' --page-size ' . escapeshellarg($this->size);
+		}
+
+		if (!is_null($this->zoom)) {
+			$cmd .= ' --zoom ' . escapeshellarg($this->zoom);
 		}
 
 		if (!is_null($this->header)) {

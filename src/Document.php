@@ -164,7 +164,11 @@ class Document
 		$page->encoding			 = $this->encoding;
 		$page->usePrintMediaType = $this->usePrintMediaType;
 		$page->styleSheet		 = $this->styleSheet;
-		$page->zoom              = $this->zoom;
+
+		if (!is_null($this->zoom)) {
+			$page->zoom = $this->zoom;
+		}
+
 		return $page;
 	}
 
